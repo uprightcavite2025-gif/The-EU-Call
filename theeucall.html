@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Branching Scenario — “The EU Call” (Mobile-Friendly)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#101a33;
+      --text:#e9f0ff;
+      --muted:#b9c6ffcc;
+      --line:#2a3a6a;
+      --accent:#3FC2C2;
+      --accent2:#63F8EF;
+      --good:#86f7a7;
+      --warn:#ffce6a;
+      --bad:#ff7b8b;
+      --shadow: 0 10px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1100px 650px at 18% 8%, rgba(99,248,239,.12), transparent 60%),
+        radial-gradient(900px 600px at 85% 0%, rgba(63,194,194,.12), transparent 55%),
+        linear-gradient(180deg, #070b16, var(--bg));
+      padding: clamp(12px, 2.2vw, 18px);
+      -webkit-text-size-adjust: 100%;
+      overflow-x:hidden;
+    }
+
+    .wrap{ max-width:1100px; margin:0 auto; width:100%; }
+    .wrap, .card, .body, .route, .port, .msg, .panel, .outcome, .guess, .resultBox{ min-width:0; }
+    .nowrapFix{ word-break: break-word; overflow-wrap:anywhere; }
+
+    .header{ padding: 6px 6px 12px; }
+    h1{
+      margin:0;
+      font-size: clamp(20px, 5.2vw, 30px);
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:10px 0 0;
+      color:var(--muted);
+      max-width: 95ch;
+      font-size: clamp(13px, 3.6vw, 14px);
+      line-height:1.5;
+    }
+
+    .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+    @media(min-width: 960px){
+      .grid{ grid-template-columns: 1.12fr .88fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(16,26,51,.88), rgba(15,23,48,.88));
+      border: 1px solid rgba(42,58,106,.82);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .head{
+      padding:14px 14px 12px;
+      border-bottom:1px solid rgba(42,58,106,.65);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .head h2{ margin:0; font-size:15px; letter-spacing:.2px; line-height:1.2; }
+    .badge{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid rgba(42,58,106,.75);
+      padding:6px 10px;
+      border-radius:999px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      background: rgba(7,11,22,.25);
+      user-select:none;
+      max-width:100%;
+    }
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.accent{background:var(--accent)}
+    .dot.good{background:var(--good)}
+    .body{ padding:14px; }
+
+    /* Story beats */
+    .beat{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(7,11,22,.22);
+      margin-bottom:12px;
+    }
+    .beat h3{
+      margin:0 0 8px 0;
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .beat p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(16,26,51,.35);
+      color:var(--muted);
+      width:fit-content;
+    }
+    .chip strong{ color:var(--text); }
+
+    /* Voyage visual */
+    .route{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(7,11,22,.22);
+      margin-top:10px;
+    }
+    .routeRow{
+      display:flex;
+      align-items:stretch;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .port{
+      flex:1;
+      min-width: 220px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(42,58,106,.65);
+      background: rgba(16,26,51,.35);
+    }
+    .port .name{ font-weight:900; }
+    .tag{
+      margin-top:6px;
+      display:inline-block;
+      font-family:var(--mono);
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(42,58,106,.8);
+      color:var(--muted);
+      background: rgba(7,11,22,.22);
+    }
+    .tag.eu{ border-color: rgba(134,247,167,.45); background: rgba(134,247,167,.10); color:var(--text); }
+    .tag.noneu{ border-color: rgba(255,206,106,.45); background: rgba(255,206,106,.10); color:var(--text); }
+    .tag.note{ border-color: rgba(63,194,194,.45); background: rgba(63,194,194,.10); color:var(--text); }
+
+    .connector{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:rgba(185,198,255,.65);
+      min-width: 80px;
+      flex: 0 0 auto;
+    }
+    .connector .line{
+      width:70px;height:2px;background: rgba(42,58,106,.75);
+      position:relative;border-radius:999px;
+    }
+    .connector .line:after{
+      content:"";
+      position:absolute;right:-2px;top:50%;
+      transform: translateY(-50%) rotate(45deg);
+      width:10px;height:10px;
+      border-right:2px solid rgba(185,198,255,.65);
+      border-top:2px solid rgba(185,198,255,.65);
+    }
+    @media(max-width: 560px){
+      .port{ min-width: 100%; }
+      .connector{ min-width: 100%; }
+      .connector .line{ width: 100%; }
+    }
+
+    /* Message bubble */
+    .msg{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(63,194,194,.35);
+      background: rgba(63,194,194,.10);
+      font-size: 13px;
+      line-height:1.55;
+      margin-top:10px;
+    }
+    .msg strong{ color:var(--accent2); }
+
+    /* Role selection */
+    .rolePick{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    @media(min-width: 520px){ .rolePick{ grid-template-columns:1fr 1fr; } }
+    .roleBtn{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(7,11,22,.22);
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      text-align:left;
+      touch-action: manipulation;
+    }
+    .roleBtn:active{ transform: scale(0.99); }
+    .roleBtn:hover{ border-color: rgba(63,194,194,.55); background: rgba(7,11,22,.30); }
+    .roleBtn .ttl{ font-weight:900; }
+    .roleBtn .desc{ color:var(--muted); font-size:12px; line-height:1.4; margin-top:6px; }
+    .roleBtn.selected{
+      border-color: rgba(63,194,194,.65);
+      background: rgba(63,194,194,.10);
+    }
+
+    /* Panels + options */
+    .panel{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(7,11,22,.22);
+      display:none;
+    }
+    .panel.show{ display:block; }
+    .panel h3{ margin:0 0 8px 0; font-size:13px; display:flex; gap:8px; align-items:center; }
+    .panel p{ margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
+    .opts{ display:grid; gap:10px; margin-top:10px; }
+
+    .opt{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(16,26,51,.35);
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      touch-action: manipulation;
+    }
+    .opt:active{ transform: scale(0.99); }
+    .opt:hover{ border-color: rgba(63,194,194,.55); background: rgba(16,26,51,.45); }
+    .opt .label{ font-weight:900; font-size: 13px; }
+    .opt .hint{ font-size:12px; color:var(--muted); margin-top:6px; line-height:1.4; }
+    .opt.selected{
+      border-color: rgba(63,194,194,.75);
+      background: rgba(63,194,194,.10);
+    }
+
+    /* Outcome */
+    .outcome{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(7,11,22,.22);
+      display:none;
+    }
+    .outcome.show{ display:block; }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(16,26,51,.35);
+      color:var(--muted);
+      width:fit-content;
+      margin-bottom:10px;
+      max-width:100%;
+    }
+    .pill.good{ border-color: rgba(134,247,167,.55); background: rgba(134,247,167,.10); color:var(--text); }
+    .pill.warn{ border-color: rgba(255,206,106,.55); background: rgba(255,206,106,.10); color:var(--text); }
+    .outcome h4{ margin:0 0 8px 0; font-size:14px; line-height:1.2; }
+    .outcome .text{ font-size:13px; line-height:1.55; }
+    .learn{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px dashed rgba(42,58,106,.85);
+      background: rgba(16,26,51,.35);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .learn strong{ color:var(--accent2); }
+    .miniList{
+      margin:8px 0 0;
+      padding-left:18px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    /* Guess panel */
+    .guess{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(7,11,22,.22);
+      display:none;
+    }
+    .guess.show{ display:block; }
+    .guess h3{ margin:0 0 8px 0; font-size:13px; }
+    .guess p{ margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
+    .resultBox{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(63,194,194,.35);
+      background: rgba(63,194,194,.10);
+      display:none;
+    }
+    .resultBox.show{ display:block; }
+    .resultBox h3{ margin:0 0 8px 0; font-size:13px; }
+    .resultBox .text{ font-size:13px; line-height:1.55; }
+
+    /* Right side dashboard */
+    .kpiGrid{ display:grid; grid-template-columns:1fr; gap:10px; }
+    @media(min-width:520px){ .kpiGrid{ grid-template-columns:1fr 1fr; } }
+    .kpi{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(42,58,106,.75);
+      background: rgba(7,11,22,.22);
+    }
+    .kpi .k{ font-size:12px; color:var(--muted); }
+    .kpi .v{ font-size:18px; font-weight:900; margin-top:4px; }
+    .kpi .s{ font-size:12px; color:var(--muted); margin-top:6px; line-height:1.4; }
+
+    .takeaway{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(63,194,194,.35);
+      background: rgba(63,194,194,.10);
+      font-size:13px;
+      line-height:1.55;
+      margin-top:12px;
+    }
+    .takeaway strong{ color:var(--accent2); }
+
+    /* Buttons */
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    button{
+      border:none;
+      border-radius:14px;
+      padding:12px 12px;
+      font-weight:800;
+      cursor:pointer;
+      background: linear-gradient(90deg, rgba(63,194,194,.95), rgba(99,248,239,.9));
+      color:#061018;
+      box-shadow: 0 10px 25px rgba(0,0,0,.3);
+      flex:1;
+      min-width: 170px;
+      touch-action: manipulation;
+    }
+    button:active{ transform: scale(0.99); }
+    button.secondary{
+      background: rgba(7,11,22,.35);
+      border:1px solid rgba(42,58,106,.9);
+      color:var(--text);
+      box-shadow:none;
+    }
+
+    .smallprint{ margin-top:10px; color:var(--muted); font-size:12px; line-height:1.5; }
+    .kbd{ font-family:var(--mono); font-size:12px; color:var(--muted); }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; scroll-behavior:auto !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>Branching Scenario: “The EU Call”</h1>
+      <p class="sub nowrapFix">
+        Follow the story, pick the role closest to your current work onboard, then see how the other side thinks.
+      </p>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Scenario + Branching -->
+      <section class="card">
+        <div class="head">
+          <h2>You are on board a container vessel</h2>
+          <div class="badge"><span class="dot accent"></span>Smooth story flow</div>
+        </div>
+
+        <div class="body">
+          <!-- Story Beat: Voyage plan (VISUAL) -->
+          <div class="beat">
+            <h3>🗺️ Voyage plan</h3>
+            <p class="nowrapFix">You review the next ports on the route.</p>
+
+            <div class="route" aria-label="Voyage visual">
+              <div class="routeRow">
+                <div class="port">
+                  <div class="name">Tangier</div>
+                  <span class="tag noneu">Morocco — non-EEA</span>
+                </div>
+                <div class="connector"><div class="line"></div></div>
+                <div class="port">
+                  <div class="name">Valencia</div>
+                  <span class="tag eu">Spain — EEA</span>
+                </div>
+              </div>
+
+              <div class="routeRow">
+                <div class="port">
+                  <div class="name">Las Palmas</div>
+                  <span class="tag note">Canary Islands — Outermost Region</span>
+                </div>
+                <div class="connector"><div class="line"></div></div>
+                <div class="port">
+                  <div class="name">Rotterdam</div>
+                  <span class="tag eu">Netherlands — EEA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Story Beat: Las Palmas conditions -->
+          <div class="beat">
+            <h3>🛢️ In Las Palmas</h3>
+            <div class="chips" aria-label="Las Palmas notes">
+              <div class="chip">✅ <strong>Bunkers only</strong></div>
+              <div class="chip">✅ <strong>No cargo operations</strong></div>
+            </div>
+          </div>
+
+          <!-- Story Beat: Company message before leaving Valencia -->
+          <div class="beat">
+            <h3>📩 Before departure from Valencia</h3>
+            <p class="nowrapFix">A message arrives from the company.</p>
+            <div class="msg nowrapFix">
+              <strong>“Please ensure voyage legs are correctly classified for EU reporting and FuelEU purposes. Last year we had discrepancies.”</strong>
+            </div>
+          </div>
+
+          <!-- Role selection with smoother storytelling -->
+          <div class="beat">
+            <h3>🎭 Choose your perspective</h3>
+            <p class="nowrapFix">
+              Choose your perspective based on your current role onboard. After your decision, you’ll also guess what the other role would do.
+            </p>
+
+            <div class="rolePick" aria-label="Role selection">
+              <div class="roleBtn" id="roleMaster" role="button" tabindex="0" aria-pressed="false">
+                <div class="ttl">🧭 Master (Captain)</div>
+                <div class="desc">You handle port log clarity, voyage leg boundaries, EU MRV / EU ETS logic.</div>
+              </div>
+              <div class="roleBtn" id="roleCE" role="button" tabindex="0" aria-pressed="false">
+                <div class="ttl">⚙️ Chief Engineer</div>
+                <div class="desc">You handle fuel classification, BDN clarity, and FuelEU factors from the engine side.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Master panel -->
+          <div class="panel" id="panelMaster">
+            <h3>🔀 Master perspective</h3>
+            <p class="nowrapFix">
+              Las Palmas has <strong>bunkers only</strong>. How do you treat it in the logbook so shore classifies legs correctly?
+            </p>
+
+            <div class="opts" id="optsMaster">
+              <div class="opt" data-choice="A" role="button" tabindex="0">
+                <div class="label">A) Record Las Palmas as a normal port of call</div>
+                <div class="hint">Log it like any standard port entry.</div>
+              </div>
+              <div class="opt" data-choice="B" role="button" tabindex="0">
+                <div class="label">B) Record as a technical stop (bunkers only)</div>
+                <div class="hint">Clear wording: “Bunkers only – no cargo operations.”</div>
+              </div>
+              <div class="opt" data-choice="C" role="button" tabindex="0">
+                <div class="label">C) Leave it for shore to decide</div>
+                <div class="hint">Assume the office will interpret the route from data.</div>
+              </div>
+            </div>
+
+            <div class="outcome" id="outMaster"></div>
+          </div>
+
+          <!-- CE panel -->
+          <div class="panel" id="panelCE">
+            <h3>🔀 Chief Engineer perspective</h3>
+            <p class="nowrapFix">
+              In Las Palmas, the supplier marks the fuel as “Marine Fuel Oil.” Your system requires <strong>HFO</strong> or <strong>LFO</strong>.
+              How do you proceed?
+            </p>
+
+            <div class="opts" id="optsCE">
+              <div class="opt" data-choice="A" role="button" tabindex="0">
+                <div class="label">A) Accept the supplier description as-is</div>
+                <div class="hint">Enter “Marine Fuel Oil” and continue operations.</div>
+              </div>
+              <div class="opt" data-choice="B" role="button" tabindex="0">
+                <div class="label">B) Verify ISO/spec and enter correct fuel category</div>
+                <div class="hint">Confirm ULSFO → LFO, VLSFO → HFO before logging.</div>
+              </div>
+              <div class="opt" data-choice="C" role="button" tabindex="0">
+                <div class="label">C) Ask shore to clarify later</div>
+                <div class="hint">Delay classification and follow up later.</div>
+              </div>
+            </div>
+
+            <div class="outcome" id="outCE"></div>
+          </div>
+
+          <!-- Guess panel -->
+          <div class="guess" id="guessPanel">
+            <h3>🔁 Now guess the other role’s perspective</h3>
+            <p class="nowrapFix">
+              What do you think the <strong id="otherRoleName">other role</strong> would choose?
+            </p>
+
+            <div class="opts" id="guessOpts"></div>
+
+            <div class="resultBox" id="finalBox">
+              <h3>✅ Integrated Outcome</h3>
+              <div class="text nowrapFix" id="finalText"></div>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button id="restart" class="secondary">Restart</button>
+            <button id="autoOpen">Go to next step</button>
+          </div>
+
+          <div class="smallprint">
+            <span class="kbd">Mobile note:</span> This uses stacked layout, large tap targets, and no overflow text.
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Dashboard -->
+      <section class="card">
+        <div class="head">
+          <h2>Shared dashboard (what both roles influence)</h2>
+          <div class="badge"><span class="dot good"></span>Bridge + Engine</div>
+        </div>
+        <div class="body">
+          <div class="kpiGrid">
+            <div class="kpi">
+              <div class="k">Bridge controls</div>
+              <div class="v">Voyage leg logic</div>
+              <div class="s nowrapFix">Port-of-call evidence → reporting boundaries → ETS/MRV coverage logic.</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Engine controls</div>
+              <div class="v">Fuel data accuracy</div>
+              <div class="s nowrapFix">Fuel class + BDN clarity → factors → FuelEU intensity accuracy.</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Common failure point</div>
+              <div class="v">Unclear records</div>
+              <div class="s nowrapFix">If logs or BDN entries are vague, shore must guess → audit questions later.</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Best habit</div>
+              <div class="v">Clear evidence</div>
+              <div class="s nowrapFix">Write it plainly: “bunkers only / no cargo”, verify fuel category early.</div>
+            </div>
+          </div>
+
+          <div class="takeaway">
+            <strong>Compliance is coordination.</strong> Clear bridge logs + correct engine fuel classification protect:
+            <br>✔ EU MRV reporting
+            <br>✔ EU ETS coverage calculation
+            <br>✔ FuelEU GHG intensity
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    let role = null;
+    let choice = null;
+    let guess = null;
+
+    const roleMaster = $("roleMaster");
+    const roleCE = $("roleCE");
+    const panelMaster = $("panelMaster");
+    const panelCE = $("panelCE");
+    const guessPanel = $("guessPanel");
+    const otherRoleName = $("otherRoleName");
+    const guessOpts = $("guessOpts");
+    const finalBox = $("finalBox");
+    const finalText = $("finalText");
+
+    const masterOutcomes = {
+      A: {
+        tone: "warn",
+        title: "Consequence: legs can be split incorrectly",
+        text: "Shore may split legs into Tangier → Valencia → Las Palmas → Rotterdam. This can change ETS leg coverage and may incorrectly split emissions.",
+        learn: "Port-of-call definition affects reporting boundaries. If logs don’t match operations (no cargo), verifiers may question it.",
+        bullets: ["May split emissions into extra legs","Audit questions: why no cargo recorded?","Extra correction work later"]
+      },
+      B: {
+        tone: "good",
+        title: "Correct: clear technical stop evidence",
+        text: "You log: “Bunkers only – no cargo operations.” Shore can keep previous port of call = Valencia and next port of call = Rotterdam.",
+        learn: "Clarity onboard keeps ETS coverage logic clean and supports FuelEU scope accuracy.",
+        bullets: ["Correct boundary evidence","Cleaner ETS/MRV logic","Less verifier questions"]
+      },
+      C: {
+        tone: "warn",
+        title: "Partial risk: shore has to guess",
+        text: "If logs are unclear, shore may misclassify the leg or treat Las Palmas as a normal port of call.",
+        learn: "Under audit, unclear documentation becomes your problem. Clarity onboard prevents compliance errors ashore.",
+        bullets: ["More guesswork for shore","Higher misclassification risk","Harder to defend later"]
+      }
+    };
+
+    const ceOutcomes = {
+      A: {
+        tone: "warn",
+        title: "Risk: wrong fuel category changes factors",
+        text: "Wrong classification may apply the wrong CO₂ factor and LCV. Small error → measurable FuelEU intensity impact.",
+        learn: "FuelEU lifecycle factors depend on correct initial classification. Errors can follow the whole report.",
+        bullets: ["Wrong factor applied","FuelEU intensity shifts","Harder to fix later"]
+      },
+      B: {
+        tone: "good",
+        title: "Correct: verify spec and classify properly",
+        text: "You confirm ULSFO → LFO and VLSFO → HFO. Correct factors apply and FuelEU reflects actual fuel used.",
+        learn: "Operational accuracy protects compliance. This is one of the highest-impact actions for FuelEU data quality.",
+        bullets: ["Correct factors/LCV","Reliable FuelEU intensity","Audit-ready data"]
+      },
+      C: {
+        tone: "warn",
+        title: "Delayed risk: fuel may be used before clarification",
+        text: "If fuel is consumed before clarification, retroactive correction becomes difficult and evidence may be missing.",
+        learn: "If unclear, verify early while evidence is available (BDN + spec sheet + system entry).",
+        bullets: ["Late corrections are harder","Evidence may be missing later","Risk of inconsistent records"]
+      }
+    };
+
+    const otherRoleOptions = {
+      MASTER: [
+        {key:"A", label:"A) Log Las Palmas as a normal port of call"},
+        {key:"B", label:"B) Record as technical stop (bunkers only)"},
+        {key:"C", label:"C) Leave it for shore to decide"}
+      ],
+      CE: [
+        {key:"A", label:"A) Accept supplier description as-is"},
+        {key:"B", label:"B) Verify spec and enter correct category"},
+        {key:"C", label:"C) Ask shore to clarify later"}
+      ]
+    };
+
+    const best = { MASTER:"B", CE:"B" };
+
+    function clearSelections(containerId){
+      document.querySelectorAll(`#${containerId} .opt`).forEach(el => el.classList.remove("selected"));
+    }
+
+    function setRolePressed(){
+      roleMaster.setAttribute("aria-pressed", role === "MASTER" ? "true" : "false");
+      roleCE.setAttribute("aria-pressed", role === "CE" ? "true" : "false");
+    }
+
+    function pickRole(r){
+      role = r;
+      choice = null;
+      guess = null;
+
+      roleMaster.classList.toggle("selected", r === "MASTER");
+      roleCE.classList.toggle("selected", r === "CE");
+      setRolePressed();
+
+      panelMaster.classList.toggle("show", r === "MASTER");
+      panelCE.classList.toggle("show", r === "CE");
+
+      $("outMaster").classList.remove("show");
+      $("outCE").classList.remove("show");
+      guessPanel.classList.remove("show");
+      finalBox.classList.remove("show");
+
+      clearSelections("optsMaster");
+      clearSelections("optsCE");
+
+      setTimeout(() => {
+        (r === "MASTER" ? panelMaster : panelCE).scrollIntoView({behavior:"smooth", block:"start"});
+      }, 60);
+    }
+
+    function renderOutcome(){
+      if(!role || !choice) return;
+
+      const data = role === "MASTER" ? masterOutcomes[choice] : ceOutcomes[choice];
+      const outEl = role === "MASTER" ? $("outMaster") : $("outCE");
+
+      outEl.className = "outcome show";
+      outEl.innerHTML = `
+        <div class="pill ${data.tone}">
+          <span class="dot ${data.tone === "good" ? "good" : "warn"}"></span>
+          ${data.tone === "good" ? "Good call" : "Watch-out"}
+        </div>
+        <h4 class="nowrapFix">${data.title}</h4>
+        <div class="text nowrapFix">${data.text}</div>
+        <div class="learn nowrapFix"><strong>Learning:</strong> ${data.learn}</div>
+        <ul class="miniList">
+          ${data.bullets.map(b => `<li class="nowrapFix">${b}</li>`).join("")}
+        </ul>
+      `;
+
+      showGuessStep();
+      setTimeout(() => guessPanel.scrollIntoView({behavior:"smooth", block:"start"}), 80);
+    }
+
+    function showGuessStep(){
+      const other = role === "MASTER" ? "CE" : "MASTER";
+      otherRoleName.textContent = other === "MASTER" ? "Master" : "Chief Engineer";
+
+      guessOpts.innerHTML = "";
+      otherRoleOptions[other].forEach(opt => {
+        const div = document.createElement("div");
+        div.className = "opt";
+        div.dataset.choice = opt.key;
+        div.setAttribute("role","button");
+        div.setAttribute("tabindex","0");
+        div.innerHTML = `
+          <div class="label nowrapFix">${opt.label}</div>
+          <div class="hint">Select what you think they would do.</div>
+        `;
+        div.addEventListener("click", () => selectGuess(div, opt.key));
+        div.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectGuess(div, opt.key); }});
+        guessOpts.appendChild(div);
+      });
+
+      guessPanel.classList.add("show");
+      finalBox.classList.remove("show");
+    }
+
+    function selectGuess(div, key){
+      guess = key;
+      guessOpts.querySelectorAll(".opt").forEach(o => o.classList.remove("selected"));
+      div.classList.add("selected");
+      renderFinalComparison();
+    }
+
+    function renderFinalComparison(){
+      if(!role || !choice || !guess) return;
+
+      const other = role === "MASTER" ? "CE" : "MASTER";
+      const yourBest = best[role];
+      const otherBest = best[other];
+
+      const youDidBest = choice === yourBest;
+      const youThinkOtherBest = guess === otherBest;
+
+      const youLine = youDidBest
+        ? "✅ Your decision matches the best-practice option for clean compliance evidence."
+        : "⚠ Your decision increases the risk of misclassification or audit questions.";
+
+      const otherLine = youThinkOtherBest
+        ? "✅ You correctly predicted the other role’s best-practice choice."
+        : "🧠 Different perspectives: the other role’s best-practice choice is not what you guessed. This is where coordination often fails.";
+
+      finalText.innerHTML = `
+        <div class="nowrapFix">
+          ${youLine}<br><br>
+          ${otherLine}<br><br>
+          <strong>Integrated outcome:</strong>
+          <ul class="miniList">
+            <li class="nowrapFix"><strong>Master controls:</strong> port-of-call evidence and voyage leg boundaries (EU MRV / EU ETS logic).</li>
+            <li class="nowrapFix"><strong>Chief Engineer controls:</strong> fuel classification and BDN-driven entries (FuelEU factors and intensity).</li>
+            <li class="nowrapFix"><strong>Best habit:</strong> bridge logs “bunkers only / no cargo”, engine verifies fuel category early.</li>
+          </ul>
+          <div class="learn" style="margin-top:10px">
+            <strong>Bottom line:</strong> Compliance is coordination. Clear logs + correct fuel classification reduce ETS/MRV/FuelEU risk.
+          </div>
+        </div>
+      `;
+      finalBox.classList.add("show");
+      setTimeout(() => finalBox.scrollIntoView({behavior:"smooth", block:"start"}), 80);
+    }
+
+    // Role handlers
+    roleMaster.addEventListener("click", () => pickRole("MASTER"));
+    roleCE.addEventListener("click", () => pickRole("CE"));
+    roleMaster.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pickRole("MASTER"); }});
+    roleCE.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pickRole("CE"); }});
+
+    // Decision options
+    document.querySelectorAll("#optsMaster .opt").forEach(opt=>{
+      opt.addEventListener("click", ()=>{
+        if(role !== "MASTER") pickRole("MASTER");
+        choice = opt.dataset.choice;
+        clearSelections("optsMaster");
+        opt.classList.add("selected");
+        renderOutcome();
+      });
+      opt.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); opt.click(); }});
+    });
+
+    document.querySelectorAll("#optsCE .opt").forEach(opt=>{
+      opt.addEventListener("click", ()=>{
+        if(role !== "CE") pickRole("CE");
+        choice = opt.dataset.choice;
+        clearSelections("optsCE");
+        opt.classList.add("selected");
+        renderOutcome();
+      });
+      opt.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); opt.click(); }});
+    });
+
+    // Buttons
+    $("restart").addEventListener("click", ()=>{
+      role = null; choice = null; guess = null;
+      roleMaster.classList.remove("selected");
+      roleCE.classList.remove("selected");
+      setRolePressed();
+      panelMaster.classList.remove("show");
+      panelCE.classList.remove("show");
+      $("outMaster").classList.remove("show");
+      $("outCE").classList.remove("show");
+      guessPanel.classList.remove("show");
+      finalBox.classList.remove("show");
+      clearSelections("optsMaster");
+      clearSelections("optsCE");
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+
+    $("autoOpen").addEventListener("click", ()=>{
+      if(!role){
+        document.querySelector(".rolePick").scrollIntoView({behavior:"smooth", block:"start"});
+        return;
+      }
+      if(role === "MASTER" && !choice) panelMaster.scrollIntoView({behavior:"smooth", block:"start"});
+      if(role === "CE" && !choice) panelCE.scrollIntoView({behavior:"smooth", block:"start"});
+      if(choice && !guess) guessPanel.scrollIntoView({behavior:"smooth", block:"start"});
+      if(choice && guess) finalBox.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  </script>
+</body>
+</html>
